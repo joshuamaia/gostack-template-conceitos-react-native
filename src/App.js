@@ -23,9 +23,15 @@ export default function App() {
   async function handleLikeRepository(id) {
     await api.post(`/repositories/${id}/like`);
 
-    api.get("repositories").then((response) => {
-      setRepositories(response.data);
-    });
+    const index = repositories.findIndex((r) => r.id === id);
+
+    repositories[index].likes += 1;
+
+    setRepositories([...repositories]);
+
+    // api.get("repositories").then((response) => {
+    //   setRepositories(response.data);
+    // });
   }
 
   return (
@@ -40,7 +46,7 @@ export default function App() {
               <Text style={styles.repository}>{item.title}</Text>
 
               {item.techs.map((tech) => (
-                <View style={styles.techsContainer}>
+                <View key={tech} style={styles.techsContainer}>
                   <Text style={styles.tech}>{tech}</Text>
                 </View>
               ))}
@@ -49,9 +55,11 @@ export default function App() {
                 <Text
                   style={styles.likeText}
                   // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
-                  testID={`repository-likes-1`}
+                  testID={`repository-likes-${item.id}`}
                 >
-                  {item.likes} curtidas
+                  {item.likes > 1
+                    ? item.likes + " curtidas"
+                    : item.likes + " curtida"}
                 </Text>
               </View>
 
@@ -59,7 +67,7 @@ export default function App() {
                 style={styles.button}
                 onPress={() => handleLikeRepository(item.id)}
                 // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
-                testID={`like-button-1`}
+                testID={`like-button-${item.id}`}
               >
                 <Text style={styles.buttonText}>Curtir</Text>
               </TouchableOpacity>
